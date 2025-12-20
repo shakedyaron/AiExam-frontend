@@ -28,34 +28,52 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-600 text-neutral-100">
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <h1 className="text-3xl font-extrabold mb-2">AI Exam</h1>
-        <p className="text-neutral-400 mb-8">
-          מעלים קובץ → יוצרים מבחן → בודקים תשובות.
-        </p>
+    <div className="min-h-screen bg-linear-to-r from-gray-50 to-gray-300 text-neutral-100  ">
+      <div className="flex gap-24 h-full p-10 pt-20">
+        <div className="max-w-3xl w-4/12 ">
+          <h1 className="text-6xl font-extrabold mb-2">
+            <span className="text-gray-950">Behan</span>
+            <span className="text-purple-800">Oti</span>
+          </h1>
 
-        {/* Creator */}
-        <Creator
-          setStatus={setStatus}
-          setExam={setExam}
-          setAnswers={setAnswers}
-          errorMsg={errorMsg}
-          setErrorMsg={setErrorMsg}
-          status={status}
-        />
+          <p className="text-neutral-700 mb-8 text-l">
+            .מעלים קובץ ← יוצרים מבחן ← בודקים תשובות
+          </p>
 
-        {/* Exam */}
-        {exam && status !== "idle" && (
-          <ExamView
-            exam={exam}
+          <p
+            dir="rtl"
+            className="text-neutral-700 mb-8 text-right leading-relaxed max-w-md"
+          >
+            <span className="font-medium">
+              יש לך סיכומים ואתה לא בטוח אם אתה באמת מוכן?
+            </span>{" "}
+            <br />
+            אין צורך להכין שאלות או לנחש, אנחנו יוצרים עבורך מבחן חכם מהחומר
+            שלך.
+          </p>
+        </div>
+        <div className=" w-7/12">
+          {/* Creator */}
+          <Creator
+            setStatus={setStatus}
+            setExam={setExam}
+            setAnswers={setAnswers}
+            errorMsg={errorMsg}
+            setErrorMsg={setErrorMsg}
             status={status}
-            answers={answers}
-            onPickAnswer={pickAnswer}
-            onSubmit={onSubmit}
-            onReset={reset}
           />
-        )}
+          {/* Exam */}
+          {exam && status !== "idle" && (
+            <ExamView
+              exam={exam}
+              status={status}
+              answers={answers}
+              onPickAnswer={pickAnswer}
+              onSubmit={onSubmit}
+              onReset={reset}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

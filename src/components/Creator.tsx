@@ -55,7 +55,7 @@ function Creator({
   }
 
   return (
-    <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-5 mb-7">
+    <div className="bg-white border  shadow-xl/30 rounded-2xl p-5 mb-7">
       <div className="grid gap-4 md:grid-cols-3">
         <div className="md:col-span-3">
           <label className="block text-sm text-neutral-300 mb-2">
