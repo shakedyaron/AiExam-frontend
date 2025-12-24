@@ -44,3 +44,27 @@ export async function generateExam(params: {
 
   return data as Exam;
 }
+
+
+
+export async function generateDemoExam(params: {
+  numQuestions: number;
+  difficulty: Difficulty;
+}): Promise<Exam> {
+  const base = import.meta.env.VITE_API_BASE as string;
+
+  const res = await fetch(`${base}/api/exam/generate-demo`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      numQuestions: params.numQuestions,
+      difficulty: params.difficulty,
+    }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) throw data as ApiError;
+
+  return data as Exam;
+}

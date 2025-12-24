@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type Exam } from "./api/examApi";
 import Creator from "./components/Creator";
 import type { Status } from "./types/status";
 import ExamView from "./components/ExamView";
+import { mockExam } from "./mocks/mockExam";
 
 export default function App() {
   const [exam, setExam] = useState<Exam | null>(null);
@@ -27,11 +28,54 @@ export default function App() {
     setErrorMsg("");
   }
 
+  // useEffect(() => {
+  //   const isDev = import.meta.env.DEV;
+  //   if (!isDev) return;
+
+  //   if (!exam) {
+  //     setExam(mockExam);
+  //     setStatus("ready");
+  //     setAnswers({});
+  //     setErrorMsg("");
+  //   }
+  // }, []); // רק פעם אחת בטעינה
+
   return (
-    <div className="min-h-screen bg-linear-to-r from-gray-50 to-gray-300 text-neutral-100  ">
+    <div className="min-h-screen bg-linear-to-r from-gray-300 to-gray-50 text-neutral-100  ">
       <div className="flex gap-24 h-full p-10 pt-20">
+        <div className="w-7/12 flex justify-center">
+          {exam && (status === "ready" || status === "finished") ? (
+            <ExamView
+              exam={exam}
+              status={status}
+              answers={answers}
+              onPickAnswer={pickAnswer}
+              onSubmit={onSubmit}
+              onReset={reset}
+            />
+          ) : (
+            <Creator
+              setStatus={setStatus}
+              setExam={setExam}
+              setAnswers={setAnswers}
+              errorMsg={errorMsg}
+              setErrorMsg={setErrorMsg}
+              status={status}
+            />
+          )}
+
+          {/* <ExamView
+            exam={exam}
+            status={status}
+            answers={answers}
+            onPickAnswer={pickAnswer}
+            onSubmit={onSubmit}
+            onReset={reset}
+          /> */}
+        </div>
+
         <div className="max-w-3xl w-4/12 ">
-          <h1 className="text-6xl font-extrabold mb-2">
+          <h1 className="text-6xl font-extrabold mb-2 flex gap-3">
             <span className="text-gray-950">Behan</span>
             <span className="text-purple-800">Oti</span>
           </h1>
@@ -51,28 +95,25 @@ export default function App() {
             אין צורך להכין שאלות או לנחש, אנחנו יוצרים עבורך מבחן חכם מהחומר
             שלך.
           </p>
-        </div>
-        <div className=" w-7/12">
-          {/* Creator */}
-          <Creator
-            setStatus={setStatus}
-            setExam={setExam}
-            setAnswers={setAnswers}
-            errorMsg={errorMsg}
-            setErrorMsg={setErrorMsg}
-            status={status}
-          />
-          {/* Exam */}
-          {exam && status !== "idle" && (
-            <ExamView
-              exam={exam}
-              status={status}
-              answers={answers}
-              onPickAnswer={pickAnswer}
-              onSubmit={onSubmit}
-              onReset={reset}
-            />
-          )}
+          <div
+            dir="rtl"
+            className="mt-4 flex flex-wrap gap-2 justify-end flex-col"
+          >
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/60 border border-white px-3 py-1 text-sm text-neutral-700">
+              <span className="text-emerald-600">✔</span>
+              שאלות אמריקאיות + פתוחות
+            </span>
+
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/60 border border-white px-3 py-1 text-sm text-neutral-700">
+              <span className="text-emerald-600">✔</span>
+              בדיקה והסברים
+            </span>
+
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/60 border border-white px-3 py-1 text-sm text-neutral-700">
+              <span className="text-emerald-600">✔</span>
+              מותאם לקושי ולכמות
+            </span>
+          </div>
         </div>
       </div>
     </div>
