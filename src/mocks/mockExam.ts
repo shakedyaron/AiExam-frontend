@@ -1,6 +1,7 @@
 import type { Exam } from "../api/examApi";
 
 export const mockExam: Exam = {
+  examId: null,
   title: "מבחן דמו — ידע כללי",
   difficulty: "medium",
   questions: [
