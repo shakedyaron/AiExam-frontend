@@ -375,8 +375,7 @@ export default function Creator({
           <button
             type="button"
             onClick={onGenerateDemo}
-            disabled={status === "loading"}
-            className="text-white/30 text-xs font-medium hover:text-violet-400 transition-colors disabled:opacity-50 cursor-pointer"
+            className="text-white/30 text-xs font-medium hover:text-violet-400 transition-colors cursor-pointer"
           >
             נסה דוגמה בלי קובץ »
           </button>

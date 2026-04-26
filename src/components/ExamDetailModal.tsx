@@ -3,18 +3,15 @@ import { motion } from "framer-motion";
 import { createPortal } from "react-dom";
 import {
   getExamDetail,
-  generateFromMistakes,
   type ExamDetail,
   type MCQQuestion,
   type OpenQuestion,
 } from "../api/examApi";
-import type { Exam } from "../api/examApi";
 
 type Props = {
   examId: string;
   token: string;
   onClose: () => void;
-  onStartExam: (exam: Exam) => void;
 };
 
 const diffLabel: Record<string, string> = {
@@ -38,12 +35,9 @@ export default function ExamDetailModal({
   examId,
   token,
   onClose,
-  onStartExam,
 }: Props) {
   const [exam, setExam] = useState<ExamDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
-  const [genError, setGenError] = useState("");
 
   useEffect(() => {
     getExamDetail(examId, token)
@@ -51,25 +45,6 @@ export default function ExamDetailModal({
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [examId, token]);
-
-  async function handleGenerateFromMistakes() {
-    if (!exam) return;
-    setGenerating(true);
-    setGenError("");
-    try {
-      const newExam = await generateFromMistakes({
-        examId: exam.id,
-        numQuestions: 5,
-        token,
-      });
-      onStartExam(newExam);
-      onClose();
-    } catch (err: any) {
-      setGenError(err?.details?.message ?? "שגיאה ביצירת המבחן");
-    } finally {
-      setGenerating(false);
-    }
-  }
 
   const pct = exam?.score
     ? Math.round((exam.score.correct / exam.score.total) * 100)

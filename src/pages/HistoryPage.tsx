@@ -674,7 +674,6 @@ export default function HistoryPage({ onStartExam }: Props) {
           examId={selectedId}
           token={session.access_token}
           onClose={() => setSelectedId(null)}
-          onStartExam={onStartExam}
         />
       )}
 

@@ -4,7 +4,7 @@ import { getExamHistory, type HistoryItem } from "../api/examApi";
 
 const difficultyLabel: Record<string, string> = { easy: "קל", medium: "בינוני", hard: "קשה" };
 
-export default function ExamHistory({ onOpenHistory }: { onOpenHistory?: () => void }) {
+export default function ExamHistory() {
   const { session } = useAuth();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(false);

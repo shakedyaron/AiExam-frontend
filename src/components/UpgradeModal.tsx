@@ -11,6 +11,7 @@ const PLANS = [
     color: "border-violet-500/50",
     bg: "#1a1025",
     badge: "bg-violet-500/20 text-violet-300 border-violet-500/30",
+    highlight: false,
     features: [
       "30 מבחנים בחודש",
       "עד 20 שאלות",
