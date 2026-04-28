@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 type Props = {
@@ -8,22 +8,28 @@ type Props = {
 
 export default function FloatBox({ children, className = "" }: Props) {
   const reduce = useReducedMotion();
+  const [isDesktop] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(min-width: 768px)").matches,
+  );
+
+  const shouldAnimate = !reduce && isDesktop;
 
   return (
     <motion.div
       dir="rtl"
       className={`transform-gpu ${className}`}
-      style={{ willChange: "transform" }}
-      animate={reduce ? undefined : { y: -10 }}
+      style={{ willChange: shouldAnimate ? "transform" : "auto" }}
+      animate={shouldAnimate ? { y: -10 } : undefined}
       transition={
-        reduce
-          ? undefined
-          : {
+        shouldAnimate
+          ? {
               duration: 1.2,
               repeat: Infinity,
               repeatType: "mirror",
               ease: "easeInOut",
             }
+          : undefined
       }
     >
       {children}

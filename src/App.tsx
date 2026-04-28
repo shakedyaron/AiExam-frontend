@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { type Exam, saveScore } from "./api/examApi";
 import Creator from "./components/Creator";
 import type { Status } from "./types/status";
@@ -10,6 +10,26 @@ import AuthPage from "./pages/AuthPage";
 import Navbar from "./components/Navbar";
 import HistoryPage from "./pages/HistoryPage";
 import PlansPage from "./pages/PlansPage";
+
+/* ── Scroll reset on every route change ── */
+function scrollAllToTop() {
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  document.getElementById("app-scroll-container")?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    scrollAllToTop();
+    const t1 = setTimeout(scrollAllToTop, 0);
+    const t2 = setTimeout(scrollAllToTop, 100);
+    const t3 = setTimeout(scrollAllToTop, 300);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [pathname]);
+  return null;
+}
 
 /* ── Route guards ── */
 
@@ -36,7 +56,7 @@ function RedirectIfAuth({ children }: { children: React.ReactNode }) {
 /* ── Background orbs (shared) ── */
 function Orbs() {
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
+    <div className="orbs-layer hidden md:block fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
       <div className="absolute -top-60 -right-60 w-175 h-175 bg-violet-700/20 rounded-full blur-[140px]" />
       <div className="absolute top-1/2 -left-60 w-150 h-150 bg-purple-900/25 rounded-full blur-[120px]" />
       <div className="absolute -bottom-60 right-1/3 w-125 h-125 bg-pink-900/15 rounded-full blur-[120px]" />
@@ -49,6 +69,16 @@ function Orbs() {
 function HomePage() {
   const { session } = useAuth();
   const navigate = useNavigate();
+
+  // Restore overflow locked by AuthPage and hard-reset every possible scroll container
+  useEffect(() => {
+    document.body.style.overflow = "";
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    document.getElementById("home-scroll-root")?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []);
+
   const [exam, setExam] = useState<Exam | null>(null);
   const [status, setStatus] = useState<Status>("idle");
 
@@ -122,6 +152,7 @@ function HomePage() {
       <Navbar />
 
       <div
+        id="home-scroll-root"
         className="relative z-10 flex flex-col items-center md:items-start md:flex-row md:gap-12 gap-8 pt-20 sm:pt-22 px-4 sm:px-8 md:px-14 pb-10"
         dir="rtl"
       >
@@ -215,13 +246,16 @@ function HistoryRoute() {
 
 function AppRoutes() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       <Route path="/login" element={<RedirectIfAuth><AuthPage /></RedirectIfAuth>} />
       <Route path="/home"  element={<RequireAuth><HomePage /></RequireAuth>} />
       <Route path="/history" element={<RequireAuth><HistoryRoute /></RequireAuth>} />
       <Route path="/plans" element={<RequireAuth><PlansPage /></RequireAuth>} />
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
+    </>
   );
 }
 
@@ -229,7 +263,9 @@ export default function App() {
   return (
     <AuthProvider>
       <UserProvider>
-        <AppRoutes />
+        <div id="app-scroll-container">
+          <AppRoutes />
+        </div>
       </UserProvider>
     </AuthProvider>
   );

@@ -14,7 +14,7 @@ function translateError(msg: string): string {
   if (msg.includes("Invalid login") || msg.includes("invalid_credentials"))
     return "אימייל או סיסמה שגויים.";
   if (msg.includes("Email not confirmed"))
-    return "עדיין לא אישרת את האימייל שלך. בדוק את תיבת הדואר.";
+    return "יש לאמת את כתובת האימייל דרך הקישור שנשלח אליך לפני התחברות.";
   if (msg.includes("Password should be at least"))
     return "הסיסמה חייבת להכיל לפחות 6 תווים.";
   if (msg.includes("over_email_send_rate_limit"))
@@ -28,7 +28,18 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [success, setSuccess] = useState(() => {
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    if (params.get("type") === "signup") {
+      history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search,
+      );
+      return "האימייל אומת בהצלחה! אפשר להתחבר עכשיו.";
+    }
+    return "";
+  });
 
   const emailValid = email === "" || EMAIL_REGEX.test(email);
   const passwordValid = password === "" || password.length >= 6;
@@ -52,13 +63,24 @@ export default function AuthPage() {
     if (mode === "register") {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) setError(translateError(error.message));
-      else setSuccess("נרשמת בהצלחה! אתה יכול להתחבר עכשיו.");
+      else
+        setSuccess(
+          "שלחנו מייל אימות אם הכתובת חדשה במערכת. אם כבר יש לך חשבון — עבור להתחברות.",
+        );
     } else {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) setError(translateError(error.message));
+      if (error) {
+        setError(translateError(error.message));
+      } else {
+        if (document.activeElement instanceof HTMLElement)
+          document.activeElement.blur();
+        setTimeout(() => {
+          window.location.href = `${window.location.origin}/home?fresh=${Date.now()}`;
+        }, 150);
+      }
     }
 
     setLoading(false);
@@ -74,7 +96,7 @@ export default function AuthPage() {
     <div className="min-h-screen bg-[#080810] flex items-center justify-center px-4 relative overflow-hidden">
       {/* Orbs */}
       <div
-        className="fixed inset-0 pointer-events-none overflow-hidden"
+        className="orbs-layer hidden md:block fixed inset-0 pointer-events-none overflow-hidden"
         aria-hidden
       >
         <div className="absolute -top-40 -right-40 w-125 h-125 bg-violet-700/25 rounded-full blur-[120px]" />
@@ -111,7 +133,7 @@ export default function AuthPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm ${!emailValid ? "border-red-500/50" : ""}`}
+                className={`glass-input w-full rounded-xl px-4 py-2.5 text-base md:text-sm ${!emailValid ? "border-red-500/50" : ""}`}
                 placeholder="you@example.com"
               />
               {!emailValid && (
@@ -131,7 +153,7 @@ export default function AuthPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm ${!passwordValid ? "border-red-500/50" : ""}`}
+                className={`glass-input w-full rounded-xl px-4 py-2.5 text-base md:text-sm ${!passwordValid ? "border-red-500/50" : ""}`}
                 placeholder="לפחות 6 תווים"
               />
               {!passwordValid && (
@@ -149,7 +171,16 @@ export default function AuthPage() {
             )}
             {success && (
               <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-sm text-emerald-400 text-right">
-                {success}
+                <p>{success}</p>
+                {mode === "register" && (
+                  <button
+                    type="button"
+                    onClick={switchMode}
+                    className="mt-1.5 text-violet-400 font-semibold hover:text-violet-300 transition-colors underline underline-offset-2 cursor-pointer"
+                  >
+                    התחברות
+                  </button>
+                )}
               </div>
             )}
 
